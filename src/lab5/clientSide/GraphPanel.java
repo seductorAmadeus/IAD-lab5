@@ -1,7 +1,5 @@
 package lab5.clientSide;
 
-import jdk.nashorn.internal.objects.NativeUint8Array;
-
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -18,6 +16,7 @@ public class GraphPanel extends JPanel implements MouseListener, ChangeListener 
     private JButton addButton;
     private int onScreenR;
     private ArrayList<Point> vectorOfPoints;
+    private ArrayList<Point> copyVectorOfPoints;
     private Map<Integer, StateOfPoints> points;
     private boolean radiusChanged;
     private Color colorOfThePlotArea = Color.black;
@@ -77,26 +76,7 @@ public class GraphPanel extends JPanel implements MouseListener, ChangeListener 
 
     }
 
-    private boolean getStateCursor() {
-        return stateCursor;
-    }
-
-    public JLabel getRadiusLabel() {
-        return radiusLabel;
-    }
-
-    @Override
-    protected void paintComponent(Graphics graph) {
-        Graphics2D graphic = (Graphics2D) graph;
-        super.paintComponent(graphic);
-        Color backgroundColor = new Color(0xFF, 248, 116);
-        Dimension size = this.getSize();
-        onScreenR = Math.min(size.width, size.height) / 3;
-        int[] xPoints = new int[]{78, 238, 238};
-        int[] yPoints = new int[]{245, 245, 84};
-        super.paintComponent(graphic);
-        this.setBackground(backgroundColor);
-
+    private void changeLocalisation() {
         xLabel.setText((String) i18n.getObject("change_x_point"));
         yLabel.setText((String) i18n.getObject("change_y_point"));
         radiusLabel.setText((String) i18n.getObject("change_radius"));
@@ -112,47 +92,45 @@ public class GraphPanel extends JPanel implements MouseListener, ChangeListener 
             setLocale(new Locale("fi"));
         }
         setResourceBundle(ResourceBundle.getBundle("lab5.resources.loc_data", getLocale()));
+    }
 
-        graphic.setColor(colorOfThePlotArea);
-        graphic.fillArc(size.width / 2 - onScreenR, size.height / 2 - onScreenR, onScreenR * 2, onScreenR * 2, -90, -90);
-        graphic.fillRect(size.width / 2 + onScreenR / 4 - 39, size.height - onScreenR * 2 - 9, onScreenR, onScreenR / 2);
-        graphic.fillPolygon(xPoints, yPoints, 3);
-        graphic.setColor(Color.RED);
+    private boolean getStateCursor() {
+        return stateCursor;
+    }
 
-        graphic.drawLine(size.width / 2, size.height, size.width / 2, 0);
-        graphic.drawLine(size.width / 2, 0, size.width / 2 - 4, 10);
-        graphic.drawString("0", size.width / 2 + 2, size.height / 2 - 14);
-        graphic.drawString("X", size.width - 10, size.height / 2 - 14);
-        graphic.drawString("Y", size.width / 2 + 10, 10);
+    public JLabel getRadiusLabel() {
+        return radiusLabel;
+    }
 
-        graphic.drawLine(size.width / 2, 0, size.width / 2 + 4, 10);
-        graphic.drawLine(0, size.height / 2, size.width, size.height / 2);
-        graphic.drawLine(size.width - 10, size.height / 2 - 4, size.width, size.height / 2);
-        graphic.drawLine(size.width - 10, size.height / 2 + 4, size.width, size.height / 2);
-        graphic.drawLine(size.width / 2 - 4, size.height / 2 - onScreenR, size.width / 2 + 4, size.height / 2 - onScreenR);
-        graphic.drawString("-R", size.width / 2 + 8, size.height / 2 + onScreenR + 5);
-        graphic.drawLine(size.width / 2 - 4, size.height / 2 - onScreenR / 2, size.width / 2 + 4, size.height / 2 - onScreenR / 2);
-        graphic.drawString("-R/2", size.width / 2 + 8, size.height / 2 + onScreenR / 2 + 5);
-        graphic.drawLine(size.width / 2 - 4, size.height / 2 + onScreenR / 2, size.width / 2 + 4, size.height / 2 + onScreenR / 2);
-        graphic.drawString("R/2", size.width / 2 + 8, size.height / 2 - onScreenR / 2 + 5);
-        graphic.drawLine(size.width / 2 - 4, size.height / 2 + onScreenR, size.width / 2 + 4, size.height / 2 + onScreenR);
-        graphic.drawString("R", size.width / 2 + 8, size.height / 2 - onScreenR + 5);
-        graphic.drawLine(size.width / 2 - onScreenR, size.height / 2 - 4, size.width / 2 - onScreenR, size.height / 2 + 4);
-        graphic.drawString("-R", size.width / 2 - onScreenR - 5, size.height / 2 - 10);
-        graphic.drawLine(size.width / 2 - onScreenR / 2, size.height / 2 - 4, size.width / 2 - onScreenR / 2, size.height / 2 + 4);
-        graphic.drawString("-R/2", size.width / 2 - onScreenR / 2 - 5, size.height / 2 - 10);
-        graphic.drawLine(size.width / 2 + onScreenR / 2, size.height / 2 - 4, size.width / 2 + onScreenR / 2, size.height / 2 + 4);
-        graphic.drawString("R/2", size.width / 2 + onScreenR / 2 - 5, size.height / 2 - 10);
-        graphic.drawLine(size.width / 2 + onScreenR, size.height / 2 - 4, size.width / 2 + onScreenR, size.height / 2 + 4);
-        graphic.drawString("R", size.width / 2 + onScreenR - 5, size.height / 2 - 10);
+    @Override
+    protected void paintComponent(Graphics graph) {
+        Graphics2D graphic = (Graphics2D) graph;
+        super.paintComponent(graphic);
+        Color backgroundColor = new Color(0xFF, 248, 116);
+        Dimension size = this.getSize();
+        onScreenR = Math.min(size.width, size.height) / 3;
+
+        super.paintComponent(graphic);
+        this.setBackground(backgroundColor);
+
+        changeLocalisation();
+
+        drawGraph(graphic, size);
+
+        copyVectorOfPoints = new ArrayList<>(vectorOfPoints);
 
         if (radiusChanged) {
             for (int i = 0; i < vectorOfPoints.size(); i++) {
                 addMark(vectorOfPoints.get(i));
             }
+
+            for (int i = 0; i < copyVectorOfPoints.size(); i++) {
+                vectorOfPoints.add(copyVectorOfPoints.get(i));
+            }
             radiusChanged = false;
         }
 
+        // TODO: remove "println()" methods
         System.out.println("points:" + points.size());
         System.out.println("vectorOfPoints: " + vectorOfPoints.size());
 
@@ -178,7 +156,7 @@ public class GraphPanel extends JPanel implements MouseListener, ChangeListener 
         if (countOfPointInArea < getCountOfPointsInArea() && (spinnerIsChanged)) {
             countOfPointInArea = getCountOfPointsInArea();
             spinnerIsChanged = false;
-            if (animationWasNotRun) drawGraph();
+            if (animationWasNotRun) runAnimation();
         }
 
     }
@@ -234,7 +212,44 @@ public class GraphPanel extends JPanel implements MouseListener, ChangeListener 
         repaint();
     }
 
-    private synchronized void drawGraph() {
+    private void drawGraph(Graphics2D graphic, Dimension size) {
+        int[] xPoints = new int[]{78, 238, 238};
+        int[] yPoints = new int[]{245, 245, 84};
+
+        graphic.setColor(colorOfThePlotArea);
+        graphic.fillArc(size.width / 2 - onScreenR, size.height / 2 - onScreenR, onScreenR * 2, onScreenR * 2, -90, -90);
+        graphic.fillRect(size.width / 2 + onScreenR / 4 - 39, size.height - onScreenR * 2 - 9, onScreenR, onScreenR / 2);
+        graphic.fillPolygon(xPoints, yPoints, 3);
+        graphic.setColor(Color.RED);
+
+        graphic.drawLine(size.width / 2, size.height, size.width / 2, 0);
+        graphic.drawLine(size.width / 2, 0, size.width / 2 - 4, 10);
+        graphic.drawString("0", size.width / 2 + 2, size.height / 2 - 14);
+        graphic.drawString("X", size.width - 10, size.height / 2 - 14);
+        graphic.drawString("Y", size.width / 2 + 10, 10);
+        graphic.drawLine(size.width / 2, 0, size.width / 2 + 4, 10);
+        graphic.drawLine(0, size.height / 2, size.width, size.height / 2);
+        graphic.drawLine(size.width - 10, size.height / 2 - 4, size.width, size.height / 2);
+        graphic.drawLine(size.width - 10, size.height / 2 + 4, size.width, size.height / 2);
+        graphic.drawLine(size.width / 2 - 4, size.height / 2 - onScreenR, size.width / 2 + 4, size.height / 2 - onScreenR);
+        graphic.drawString("-R", size.width / 2 + 8, size.height / 2 + onScreenR + 5);
+        graphic.drawLine(size.width / 2 - 4, size.height / 2 - onScreenR / 2, size.width / 2 + 4, size.height / 2 - onScreenR / 2);
+        graphic.drawString("-R/2", size.width / 2 + 8, size.height / 2 + onScreenR / 2 + 5);
+        graphic.drawLine(size.width / 2 - 4, size.height / 2 + onScreenR / 2, size.width / 2 + 4, size.height / 2 + onScreenR / 2);
+        graphic.drawString("R/2", size.width / 2 + 8, size.height / 2 - onScreenR / 2 + 5);
+        graphic.drawLine(size.width / 2 - 4, size.height / 2 + onScreenR, size.width / 2 + 4, size.height / 2 + onScreenR);
+        graphic.drawString("R", size.width / 2 + 8, size.height / 2 - onScreenR + 5);
+        graphic.drawLine(size.width / 2 - onScreenR, size.height / 2 - 4, size.width / 2 - onScreenR, size.height / 2 + 4);
+        graphic.drawString("-R", size.width / 2 - onScreenR - 5, size.height / 2 - 10);
+        graphic.drawLine(size.width / 2 - onScreenR / 2, size.height / 2 - 4, size.width / 2 - onScreenR / 2, size.height / 2 + 4);
+        graphic.drawString("-R/2", size.width / 2 - onScreenR / 2 - 5, size.height / 2 - 10);
+        graphic.drawLine(size.width / 2 + onScreenR / 2, size.height / 2 - 4, size.width / 2 + onScreenR / 2, size.height / 2 + 4);
+        graphic.drawString("R/2", size.width / 2 + onScreenR / 2 - 5, size.height / 2 - 10);
+        graphic.drawLine(size.width / 2 + onScreenR, size.height / 2 - 4, size.width / 2 + onScreenR, size.height / 2 + 4);
+        graphic.drawString("R", size.width / 2 + onScreenR - 5, size.height / 2 - 10);
+    }
+
+    private synchronized void runAnimation() {
         animationWasNotRun = false;
         if (!animationWasNotRun) {
             Thread animation = new Thread(new Runnable() {

@@ -3,15 +3,15 @@ package lab5.clientSide;
 class StateOfPoints {
     private static int index = 0;
     private final int id;
+    public Point point;
     private State state = State.POINT_STATE_UNKNOWN;
     private float radius;
-    public Point point;
 
     StateOfPoints(Point point, float radius, State state) {
         id = index++;
         this.point = point;
         this.setRadius(radius);
-        this.setState(State.POINT_STATE_UNKNOWN);
+        this.setState(state); // state default?
     }
 
     public int getId() {
