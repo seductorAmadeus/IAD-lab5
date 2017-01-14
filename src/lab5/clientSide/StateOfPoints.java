@@ -11,7 +11,15 @@ class StateOfPoints {
         id = index++;
         this.point = point;
         this.setRadius(radius);
-        this.setState(state); // state default?
+        this.setState(state);
+    }
+
+    public static int getIndex() {
+        return index;
+    }
+
+    public static void setIndex(int index) {
+        StateOfPoints.index = index;
     }
 
     public int getId() {

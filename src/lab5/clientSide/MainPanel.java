@@ -26,6 +26,10 @@ public class MainPanel extends JFrame {
         setVisible(true);
     }
 
+    public static void main(String[] args) {
+        new MainPanel();
+    }
+
     public DataPanel getDataPanel() {
         return dataPanel;
     }

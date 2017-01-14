@@ -9,14 +9,13 @@ import java.awt.event.MouseListener;
 import java.util.*;
 
 public class GraphPanel extends JPanel implements MouseListener, ChangeListener {
-    private final static int sizeOfPoint = 4;
+    private final static int SIZE_OF_POINT = 4;
     private float radius;
     private JLabel labelWithCoordinates;
     private JSpinner radiusSpinner;
     private JButton addButton;
     private int onScreenR;
     private ArrayList<Point> vectorOfPoints;
-    private ArrayList<Point> copyVectorOfPoints;
     private Map<Integer, StateOfPoints> points;
     private boolean radiusChanged;
     private Color colorOfThePlotArea = Color.black;
@@ -36,12 +35,11 @@ public class GraphPanel extends JPanel implements MouseListener, ChangeListener 
         radiusChanged = false;
         points = new HashMap<>();
         client = new Client();
-        System.out.println("creating new thread...");
+        System.out.println("New thread has been created..\n");
         new Thread(() -> {
             while (true) {
-                System.out.println("receiving...");
+                System.out.println("Receiving new data...");
                 ServerAnswer ans = client.getFromTheServer();
-                System.out.println("answer: " + ans.stateOfPointsIs);
                 points.get(ans.pointCounter).setState((ans.stateOfPointsIs) ? State.POINT_HIT : State.POINT_MISS);
                 graphPanel1.repaint();
             }
@@ -76,7 +74,7 @@ public class GraphPanel extends JPanel implements MouseListener, ChangeListener 
 
     }
 
-    private void changeLocalisation() {
+    private void changeLocalization() {
         xLabel.setText((String) i18n.getObject("change_x_point"));
         yLabel.setText((String) i18n.getObject("change_y_point"));
         radiusLabel.setText((String) i18n.getObject("change_radius"));
@@ -113,42 +111,32 @@ public class GraphPanel extends JPanel implements MouseListener, ChangeListener 
         super.paintComponent(graphic);
         this.setBackground(backgroundColor);
 
-        changeLocalisation();
+        changeLocalization();
 
         drawGraph(graphic, size);
 
-        copyVectorOfPoints = new ArrayList<>(vectorOfPoints);
-
         if (radiusChanged) {
-            for (int i = 0; i < vectorOfPoints.size(); i++) {
-                addMark(vectorOfPoints.get(i));
-            }
-
-            for (int i = 0; i < copyVectorOfPoints.size(); i++) {
-                vectorOfPoints.add(copyVectorOfPoints.get(i));
-            }
+            points.clear();
+            StateOfPoints.setIndex(0);
+            vectorOfPoints.forEach(this::addMark);
             radiusChanged = false;
         }
-
-        // TODO: remove "println()" methods
-        System.out.println("points:" + points.size());
-        System.out.println("vectorOfPoints: " + vectorOfPoints.size());
 
         for (int i = 0; i < vectorOfPoints.size(); i++) {
             if (points.get(i).getState() == State.POINT_STATE_UNKNOWN) {
                 client.sendPacket(points.get(i), radius);
                 graphic.setColor(Color.GRAY);
-                graphic.fillArc((int) ((vectorOfPoints.get(i).getX()) * (onScreenR / getRadius()) + size.width / 2 - (long) sizeOfPoint / 2), (int) ((-vectorOfPoints.get(i).getY()) * (onScreenR / getRadius()) + size.height / 2 - (long) sizeOfPoint / 2), (int) (long) sizeOfPoint, (int) (long) sizeOfPoint, 0, 360);
+                graphic.fillArc((int) ((vectorOfPoints.get(i).getX()) * (onScreenR / getRadius()) + size.width / 2 - (long) SIZE_OF_POINT / 2), (int) ((-vectorOfPoints.get(i).getY()) * (onScreenR / getRadius()) + size.height / 2 - (long) SIZE_OF_POINT / 2), (int) (long) SIZE_OF_POINT, (int) (long) SIZE_OF_POINT, 0, 360);
                 getLabelWithCoordinates().setText(String.format("(%.3f; %.3f)\n", vectorOfPoints.get(i).getX(), vectorOfPoints.get(i).getY()));
             }
             if (points.get(i).getState() == State.POINT_HIT) {
                 graphic.setColor(Color.GREEN);
-                graphic.fillArc((int) ((vectorOfPoints.get(i).getX()) * (onScreenR / getRadius()) + size.width / 2 - (long) sizeOfPoint / 2), (int) ((-vectorOfPoints.get(i).getY()) * (onScreenR / getRadius()) + size.height / 2 - (long) sizeOfPoint / 2), (int) (long) sizeOfPoint, (int) (long) sizeOfPoint, 0, 360);
+                graphic.fillArc((int) ((vectorOfPoints.get(i).getX()) * (onScreenR / getRadius()) + size.width / 2 - (long) SIZE_OF_POINT / 2), (int) ((-vectorOfPoints.get(i).getY()) * (onScreenR / getRadius()) + size.height / 2 - (long) SIZE_OF_POINT / 2), (int) (long) SIZE_OF_POINT, (int) (long) SIZE_OF_POINT, 0, 360);
                 getLabelWithCoordinates().setText(String.format("(%.3f; %.3f)\n", vectorOfPoints.get(i).getX(), vectorOfPoints.get(i).getY()));
             }
             if (points.get(i).getState() == State.POINT_MISS) {
                 graphic.setColor(Color.RED);
-                graphic.fillArc((int) ((vectorOfPoints.get(i).getX()) * (onScreenR / getRadius()) + size.width / 2 - (long) sizeOfPoint / 2), (int) ((-vectorOfPoints.get(i).getY()) * (onScreenR / getRadius()) + size.height / 2 - (long) sizeOfPoint / 2), (int) (long) sizeOfPoint, (int) (long) sizeOfPoint, 0, 360);
+                graphic.fillArc((int) ((vectorOfPoints.get(i).getX()) * (onScreenR / getRadius()) + size.width / 2 - (long) SIZE_OF_POINT / 2), (int) ((-vectorOfPoints.get(i).getY()) * (onScreenR / getRadius()) + size.height / 2 - (long) SIZE_OF_POINT / 2), (int) (long) SIZE_OF_POINT, (int) (long) SIZE_OF_POINT, 0, 360);
                 getLabelWithCoordinates().setText(String.format("(%.3f; %.3f)\n", vectorOfPoints.get(i).getX(), vectorOfPoints.get(i).getY()));
             }
         }
@@ -178,8 +166,8 @@ public class GraphPanel extends JPanel implements MouseListener, ChangeListener 
     public void addNewPoint(float x, float y) {
         radiusChanged = false;
         Point point = new Point(x, y);
-        vectorOfPoints.add(point);
         StateOfPoints stateOfPoints = new StateOfPoints(point, radius, State.POINT_STATE_UNKNOWN);
+        vectorOfPoints.add(point);
         points.put(stateOfPoints.getId(), stateOfPoints);
         repaint();
     }

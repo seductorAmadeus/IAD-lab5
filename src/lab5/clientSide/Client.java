@@ -10,16 +10,20 @@ class Client {
     Client() {
         try {
             socket = new DatagramSocket();
-            System.out.println("The client-side is ready..." + socket.getLocalPort());
+            System.out.println("____________________________\n" +
+                    "Welcome, dear %username%!\n" +
+                    "\tThe client-side is ready...\n" +
+                    "\tLocal port = " + socket.getLocalPort() + "\n" +
+                    "____________________________\n");
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
     }
 
     public ServerAnswer getFromTheServer() {
         ServerAnswer serverAnswer = new ServerAnswer();
         try {
-            for (; ; ) {
+            while (true) {
                 DatagramPacket packet = new DatagramPacket(new byte[sizeOfPackage], sizeOfPackage);
                 socket.receive(packet);
 
@@ -29,7 +33,7 @@ class Client {
                 serverAnswer.pointCounter = dataInputStream.readInt();
                 serverAnswer.stateOfPointsIs = dataInputStream.readBoolean();
 
-                System.out.println("Received from: " + packet.getAddress() + ":" + 3456 + " answer: " + serverAnswer.stateOfPointsIs);
+                System.out.println("Received from " + packet.getAddress() + ":" + 3456 + "\nAnswer = " + serverAnswer.stateOfPointsIs + "\n");
 
                 return serverAnswer;
             }
@@ -57,7 +61,7 @@ class Client {
             DatagramPacket packet = new DatagramPacket(bytes, byteArrayOutputStream.size(), InetAddress.getByName("localhost"), 3456);
             socket.send(packet);
 
-            System.out.println("Send to " + packet.getAddress() + " data: " + _x + " " + _y + " " + _radius);
+            System.out.println("Send to " + packet.getAddress() + "\nx = " + _x + " y = " + _y + " radius = " + _radius + "\n");
         } catch (Exception e) {
             e.getMessage();
         }
