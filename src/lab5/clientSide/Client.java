@@ -33,7 +33,7 @@ class Client {
                 serverAnswer.pointCounter = dataInputStream.readInt();
                 serverAnswer.stateOfPointsIs = dataInputStream.readBoolean();
 
-                System.out.println("Received from " + packet.getAddress() + ":" + 3456 + "\nAnswer = " + serverAnswer.stateOfPointsIs + "\n");
+                System.out.println("Received from " + packet.getAddress() + ":" + 4718 + "\nAnswer = " + serverAnswer.stateOfPointsIs + "\n");
 
                 return serverAnswer;
             }
@@ -58,7 +58,7 @@ class Client {
             dataOutputStream.close();
             final byte[] bytes = byteArrayOutputStream.toByteArray();
 
-            DatagramPacket packet = new DatagramPacket(bytes, byteArrayOutputStream.size(), InetAddress.getByName("localhost"), 3456);
+            DatagramPacket packet = new DatagramPacket(bytes, byteArrayOutputStream.size(), InetAddress.getByName("localhost"), 4718);
             socket.send(packet);
 
             System.out.println("Send to " + packet.getAddress() + "\nx = " + _x + " y = " + _y + " radius = " + _radius + "\n");

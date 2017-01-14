@@ -15,7 +15,7 @@ public class Server {
 
     private void start() {
         try {
-            DatagramSocket socket = new DatagramSocket(3456, InetAddress.getByName("localhost"));
+            DatagramSocket socket = new DatagramSocket(4718, InetAddress.getByName("localhost"));
             System.out.println("____________________________\n" +
                     "Welcome, dear %username%!\n" +
                     "\tThe server is ready...\n" +
