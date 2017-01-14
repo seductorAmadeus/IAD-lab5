@@ -43,15 +43,15 @@ class Client {
         }
     }
 
-    public void sendPacket(StateOfPoints mw, float _radius) {
-        float _x = mw.point.getX();
-        float _y = mw.point.getY();
+    public void sendPacket(StateOfPoints stateOfPoints, float _radius) {
+        float _x = stateOfPoints.point.getX();
+        float _y = stateOfPoints.point.getY();
         try {
 
             final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             final DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
 
-            dataOutputStream.writeInt(mw.getId());
+            dataOutputStream.writeInt(stateOfPoints.getId());
             dataOutputStream.writeFloat(_radius);
             dataOutputStream.writeFloat(_x);
             dataOutputStream.writeFloat(_y);

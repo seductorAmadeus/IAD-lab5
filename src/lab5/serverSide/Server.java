@@ -45,12 +45,12 @@ public class Server {
             try {
                 final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(datagramPacket.getData());
                 final DataInputStream dais = new DataInputStream(byteArrayInputStream);
-                final int pointCounter = dais.readInt();
+                final Integer pointCounter = dais.readInt();
                 final float radius = dais.readFloat();
                 final float _x = dais.readFloat();
                 final float _y = dais.readFloat();
                 CheckPointInArea checkPointInArea = new CheckPointInArea(radius);
-                int answer = checkPointInArea.pointBelongToTheArea(new Point(_x, _y));
+                Integer answer = checkPointInArea.pointBelongToTheArea(new Point(_x, _y));
 
                 System.out.println("point №" + pointCounter + " (x = " + _x + "; y = " + _y + ") radius = " + radius +
                         ((answer == 1) ? "; the point belong to the graph; " : "; the point doesn't belong to the graph;") + " " +
